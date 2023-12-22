@@ -177,7 +177,7 @@ jobs:
       - name: Checkout toolchain
         uses: actions/checkout@v4
         with:
-          repository: shinchiro/mpv-winbuild-cmake
+          repository: ${{ github.actor }}/mpv-winbuild-cmake
           path: mpv-winbuild-cmake
       - name: Get Params
         run: |
