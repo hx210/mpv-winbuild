@@ -17,7 +17,7 @@ on:
         - all
       compiler:
         required: false
-        default: "clang"
+        default: "gcc"
         type: choice
         options:
         - gcc
@@ -441,6 +441,21 @@ jobs:
         with:
           name: ${{ env.ffmpeg_name }}
           path: mpv-winbuild-cmake/release/${{ env.ffmpeg_name }}.7z
+
+      - name: 获取fdk输出路径
+        id: fdk
+        shell: bash
+        run: |
+          fdkadll_output="$GITHUB_WORKSPACE/output"
+          mkdir -p ${fdkadll_output}
+          find "${{ github.workspace }}" -type f -name "libfdk-aac-2.dll" -print0 | xargs -0 -I {} cp -f {} "${fdkadll_output}"
+          echo "fdkadll_output=${fdkadll_output}" >>$GITHUB_ENV
+
+      - name: 上传 fdkaac
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdka-archive
+          path: ${{ env.fdkadll_output }}
 
       - name: Save clang sysroot cache
         if: ${{ inputs.compiler =='clang' && inputs.no_save_cache != true }}
