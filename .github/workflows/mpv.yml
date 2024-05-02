@@ -166,13 +166,16 @@ jobs:
     continue-on-error: true
     strategy:
       matrix: ${{ fromJson(needs.params.outputs.matrix) }}
+    permissions:
+      id-token: write
+      attestations: write
 
     steps:
       - name: Install Dependencies
         run: |
           sudo echo -e "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
           sudo pacman -Syu --noconfirm
-          sudo pacman -S --noconfirm --needed git ninja cmake meson clang lld unzip ragel yasm nasm gperf rst2pdf lib32-gcc-libs lib32-glib2 python-cairo curl wget mimalloc ccache
+          sudo pacman -S --noconfirm --needed git ninja cmake meson clang lld libc++ unzip ragel yasm nasm gperf rst2pdf lib32-gcc-libs lib32-glib2 python-cairo curl wget mimalloc ccache
           mkdir -p /home/opt/7zip
           wget -qO - https://www.7-zip.org/a/7z2301-linux-x64.tar.xz | tar -xJf - -C /home/opt/7zip 7zzs
           sudo ln -s /home/opt/7zip/7zzs /usr/bin/7z
@@ -601,11 +604,19 @@ jobs:
             }
             await core.summary.addDetails('Packages Version',packages_table).write();
 
+      - name: Attest
+        uses: actions/attest-build-provenance@v1
+        continue-on-error: true
+        with:
+          subject-path: 'mpv-winbuild-cmake/release/*.7z'
+
   publish_release:
     name: Publish release
     needs: [build_mpv,params]
     if: ${{ inputs.release == true }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -635,7 +646,6 @@ jobs:
 
       - name: Commit version & remove existing tag
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.tag_name }}
         shell: bash
         run: |
@@ -698,11 +708,10 @@ jobs:
           artifactErrorsFailBuild: true
           prerelease: false
           makeLatest: true
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Prune old releases
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git checkout main
           bash prunetags.sh
