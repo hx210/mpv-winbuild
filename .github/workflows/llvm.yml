@@ -94,7 +94,7 @@ jobs:
         with:
           bit: "64-v3"
           compiler: "clang"
-          command: "ninja -C $buildroot/build$bit rebuild_cache && cmake --build $buildroot/build$bit --target llvm-download && ninja -C $buildroot/build$bit llvm-clang"
+          command: "ninja -C $buildroot/build$bit rebuild_cache && cmake -Wno-dev --build $buildroot/build$bit --target llvm-download && ninja -C $buildroot/build$bit llvm-clang"
           extra_option: "-DLLVM_ENABLE_PGO=GEN -DLLVM_PROFILE_DATA_DIR=$buildroot/profiles/"
 
       - name: Merging profdata
