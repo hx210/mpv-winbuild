@@ -173,7 +173,7 @@ jobs:
     needs: params
     runs-on: ubuntu-latest
     container:
-      image: archlinux/archlinux:base-devel
+      image: ghcr.io/archlinux/archlinux:base-devel
     continue-on-error: true
     strategy:
       matrix: ${{ fromJson(needs.params.outputs.matrix) }}
@@ -744,7 +744,7 @@ jobs:
     if: ${{ inputs.no_save_cache != true }}
     runs-on: ubuntu-latest
     container:
-      image: archlinux/archlinux:base-devel
+      image: ghcr.io/archlinux/archlinux:base-devel
     continue-on-error: true
     strategy:
       matrix: ${{ fromJson(needs.params.outputs.matrix_bit) }}
@@ -791,7 +791,7 @@ jobs:
     if: ${{ inputs.no_save_cache != true && inputs.compiler =='clang' }}
     runs-on: ubuntu-latest
     container:
-      image: archlinux/archlinux:base-devel
+      image: ghcr.io/archlinux/archlinux:base-devel
     continue-on-error: true
 
     steps:
